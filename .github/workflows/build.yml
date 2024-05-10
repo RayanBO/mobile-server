@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - main  # ou toute autre branche que vous souhaitez surveiller
+      - master
 
 jobs:
   build:
@@ -30,8 +30,3 @@ jobs:
       with:
         name: app-release
         path: build/app/outputs/flutter-apk/app-release.apk
-
-    - name: Update README
-      run: |
-        echo "Download the latest release [here](https://hacker-chat-bo.web.app/)" > README.md
-      if: always()  # Toujours mettre à jour le README même en cas d'échec
