@@ -7,3 +7,5 @@ on envoye le message
 
 ## TODO 
 le IP tsy voray : redisgn float botoom le input discu 
+
+url relsease : build/app/outputs/flutter-apk/app-release.apk
