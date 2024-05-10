@@ -199,7 +199,7 @@ class _ServeurState extends State<Serveur> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('BO Serveur'),
+        title: const Text('HACKER CHAT'),
       ),
       body: Center(
         child: Column(
