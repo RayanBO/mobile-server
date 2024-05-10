@@ -1,17 +1,25 @@
-import 'dart:io';
+import 'dart:core';
 
 class Client {
   String ip;
-  String name;
+  String pseudo;
+  DateTime entry;
 
-  Client(this.ip, this.name);
+  Client(this.ip, this.pseudo) : entry = DateTime.now();
 
-  // Factory method to create a Client object from HttpRequest
-  factory Client.fromRequest(HttpRequest request) {
-    var connectionInfo = request.connectionInfo;
-    var remoteAddress = connectionInfo?.remoteAddress;
-    String clientIp = remoteAddress?.address ?? 'Unknown';
-    String clientName = 'Client_${DateTime.now().millisecondsSinceEpoch}'; // Default name
-    return Client(clientIp, clientName);
+  void setPseudo(String newPseudo) {
+    pseudo = newPseudo;
+  }
+}
+
+class Message {
+  String message;
+  Client client;
+  DateTime dateTime;
+
+  Message(this.message, this.client) : dateTime = DateTime.now();
+
+  Map json() {
+    return {'message': message, 'client': client.pseudo.toString(), 'dateTime': dateTime.toString()};
   }
 }

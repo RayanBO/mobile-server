@@ -5,34 +5,138 @@
   <title>Chat</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: calc(100% - 10px);
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+
+    button {
+      padding: 8px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #messages {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      min-height: 200px;
+      overflow-y: auto;
+    }
+
+    #messages p {
+      margin: 5px 0;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Chat
-  </h1>
+  <h1>Discution</h1>
+  <div>
+    <label for="nameInput">Mon pseudo :</label>
+    <input type="text" id="nameInput" />
+    <button onclick="setPseudo()">Appliquer</button>
+  </div>
   <div id="messages"></div>
   <input type="text" id="messageInput" />
-  <button onclick="sendMessage()">Send</button>
+  <button onclick="sendMessage()">Envoyer</button>
   <script>
     var xhr; // Declare xhr outside of the functions to make it accessible to both
 
     function getMessages() {
+      function formatDate(date) {
+        // Pad single digit values with leading zeros
+        function pad(value) {
+          return value < 10 ? '0' + value : value;
+        }
+
+        var day = pad(date.getDate());
+        var month = pad(date.getMonth() + 1); // Month value is zero-based, so add 1
+        var year = date.getFullYear();
+        var hours = pad(date.getHours());
+        var minutes = pad(date.getMinutes());
+        var seconds = pad(date.getSeconds());
+
+        return day + '/' + month + '/' + year + ' ' + hours + ':' + minutes + ':' + seconds;
+      }
+
       xhr = new XMLHttpRequest();
       xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
           if (xhr.status == 200) {
             // Si la réponse est OK, afficher les messages
             var response = JSON.parse(xhr.responseText);
-            var messages = response['messages'];
-            var clients = response['clients'];
+            var messages = response["messages"];
             var messagesHtml = "";
             for (var i = 0; i < messages.length; i++) {
-              messagesHtml += "<p><strong>Client: </strong>" + clients[i] + "<br><strong>Message: </strong>" + messages[i] + "</p>";
+              var timeChar = messages[i].dateTime;
+              var dateTimeParts = timeChar.split(' ');
+              var dateParts = dateTimeParts[0].split('-');
+              var timeParts = dateTimeParts[1].split(':');
+              var formattedDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], timeParts[0], timeParts[1], timeParts[2]);
+
+              var formattedDateString = formatDate(formattedDate);
+
+              messagesHtml +=
+                "<p><strong>Client: </strong>" +
+                messages[i].client +
+                "<br><strong>Date: </strong>" +
+                formattedDateString +
+                "<br><strong>Message: </strong>" +
+                messages[i].message +
+                "</p>";
             }
             document.getElementById("messages").innerHTML = messagesHtml;
           } else {
             // Si la réponse n'est pas OK, afficher l'erreur
-            document.getElementById("messages").innerHTML = "<p>Erreur: " + xhr.responseText + "</p>";
+            document.getElementById("messages").innerHTML =
+              "<p>Erreur: " + xhr.responseText + "</p>";
           }
         }
       };
@@ -40,18 +144,62 @@
       xhr.send();
     }
 
-
-    function sendMessage() {
-      var message = document.getElementById("messageInput").value;
-      xhr = new XMLHttpRequest(); // Reusing xhr variable
+    function requestPost(type) {
+      xhr = new XMLHttpRequest();
       xhr.open("POST", "/", true);
       xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.send(JSON.stringify({ message: message }));
-      document.getElementById("messageInput").value = "";
+      let dataJson;
+      if (type == "message") {
+        // message
+        var message = document.getElementById("messageInput").value;
+        dataJson = { type: "message", message: message };
+        document.getElementById("messageInput").value = "";
+      } else if (type == "init") {
+        // init
+        const randomString = generateRandomString(10);
+        const inputElement = document.getElementById("nameInput");
+        inputElement.value = randomString;
+        dataJson = { type: "init", pseudo: randomString };
+      } else {
+        // pseudo
+        var pseudo = document.getElementById("nameInput").value;
+        dataJson = { type: "pseudo", pseudo: pseudo };
+      }
+      xhr.send(JSON.stringify(dataJson));
     }
 
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+
+    function generateRandomString(length) {
+      const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let randomString = "";
+      for (let i = 0; i < length; i++) {
+        randomString += characters.charAt(getRandomInt(0, characters.length));
+      }
+      return randomString;
+    }
+
+    function setInitMe() {
+      requestPost("init");
+    }
+    function setPseudo() {
+      requestPost("pseudo");
+    }
+
+    function sendMessage() {
+      requestPost("message");
+    }
+
+    // set random pseudo
+    setInitMe();
+
     getMessages(); // Initial call to getMessages function
-    
     setInterval(getMessages, 1000); // Call getMessages function every second
   </script>
 </body>
