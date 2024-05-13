@@ -25,6 +25,9 @@ jobs:
     - name: Build APK
       run: flutter build apk
 
+    - name: Create Last Release Directory
+      run: mkdir -p last-release
+
     - name: Move APK to Last Release Directory
       run: mv build/app/outputs/flutter-apk/app-release.apk ./last-release
 
