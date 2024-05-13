@@ -19,15 +19,17 @@ jobs:
       with:
         flutter-version: '3.13.9'
 
-
     - name: Get Dependencies
       run: flutter pub get
 
     - name: Build APK
       run: flutter build apk
 
-    - name: Upload APK artifact
+    - name: Move APK to Last Release Directory
+      run: mv build/app/outputs/flutter-apk/app-release.apk ./last-release
+
+    - name: Upload APK Artifact
       uses: actions/upload-artifact@v2
       with:
         name: app-release
-        path: ./build/app/outputs/flutter-apk/app-release.apk
+        path: ./last-release/app-release.apk
