@@ -1,53 +1,53 @@
-name: Build and Deploy
+# name: Build and Deploy
 
-on:
-  push:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - master
 
-jobs:
-  build:
-    name: Build and Deploy
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     name: Build and Deploy
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+#     steps:
+#     - name: Checkout Repository
+#       uses: actions/checkout@v2
 
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.13.9'
+#     - name: Setup Flutter
+#       uses: subosito/flutter-action@v2
+#       with:
+#         flutter-version: '3.13.9'
 
-    - name: Get Dependencies
-      run: flutter pub get
+#     - name: Get Dependencies
+#       run: flutter pub get
 
-    - name: Build APK
-      run: flutter build apk
+#     - name: Build APK
+#       run: flutter build apk
 
-    - name: Move APK to Last Release Directory
-      run: mv build/app/outputs/flutter-apk/app-release.apk ./last-release
+#     - name: Move APK to Last Release Directory
+#       run: mv build/app/outputs/flutter-apk/app-release.apk ./last-release
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: app-release
-        path: ./last-release/app-release.apk
+#     - name: Upload APK Artifact
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: app-release
+#         path: ./last-release/app-release.apk
 
-    - name: Extract Artifact URL
-      id: extract_url
-      run: echo "::set-output name=url::${{ steps.upload_artifact.outputs.artifact_url }}"
+#     - name: Extract Artifact URL
+#       id: extract_url
+#       run: echo "::set-output name=url::${{ steps.upload_artifact.outputs.artifact_url }}"
 
-    - name: Write Artifact URL to File
-      run: echo "${{ steps.extract_url.outputs.url }}" > artifact_url.txt
+#     - name: Write Artifact URL to File
+#       run: echo "${{ steps.extract_url.outputs.url }}" > artifact_url.txt
 
-    - name: Update README with Artifact URL
-      uses: actions/github-script@v5
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const fs = require('fs');
-          const artifactURL = fs.readFileSync('artifact_url.txt', 'utf8').trim();
-          const readmeContent = fs.readFileSync('README.md', 'utf8');
-          const updatedReadme = readmeContent.replace(/(\[Artéfact APK\]\()(.+?)(\))/, `$1${artifactURL}$3`);
-          fs.writeFileSync('README.md', updatedReadme);
+#     - name: Update README with Artifact URL
+#       uses: actions/github-script@v5
+#       with:
+#         github-token: ${{ secrets.GITHUB_TOKEN }}
+#         script: |
+#           const fs = require('fs');
+#           const artifactURL = fs.readFileSync('artifact_url.txt', 'utf8').trim();
+#           const readmeContent = fs.readFileSync('README.md', 'utf8');
+#           const updatedReadme = readmeContent.replace(/(\[Artéfact APK\]\()(.+?)(\))/, `$1${artifactURL}$3`);
+#           fs.writeFileSync('README.md', updatedReadme);
