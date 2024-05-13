@@ -25,9 +25,6 @@ jobs:
     - name: Build APK
       run: flutter build apk
 
-    - name: Create Last Release Directory
-      run: mkdir -p last-release
-
     - name: Move APK to Last Release Directory
       run: mv build/app/outputs/flutter-apk/app-release.apk ./last-release
 
@@ -36,3 +33,21 @@ jobs:
       with:
         name: app-release
         path: ./last-release/app-release.apk
+
+    - name: Extract Artifact URL
+      id: extract_url
+      run: echo "::set-output name=url::${{ steps.upload_artifact.outputs.artifact_url }}"
+
+    - name: Write Artifact URL to File
+      run: echo "${{ steps.extract_url.outputs.url }}" > artifact_url.txt
+
+    - name: Update README with Artifact URL
+      uses: actions/github-script@v5
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs');
+          const artifactURL = fs.readFileSync('artifact_url.txt', 'utf8').trim();
+          const readmeContent = fs.readFileSync('README.md', 'utf8');
+          const updatedReadme = readmeContent.replace(/(\[Artéfact APK\]\()(.+?)(\))/, `$1${artifactURL}$3`);
+          fs.writeFileSync('README.md', updatedReadme);
