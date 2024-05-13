@@ -5,7 +5,9 @@ Application mobile to be a chat serveur
 on entre dans le port ip:12345
 on envoye le message
 
-## TODO 
-le IP tsy voray : redisgn float botoom le input discu 
 
-url relsease : build/app/outputs/flutter-apk/app-release.apk
+### url to download 
+https://github.com/RayanBO/mobile-server-web/
+
+### url pour placer le release > rm to serve-bo.apk
+/last-release/serve-bo.apk
